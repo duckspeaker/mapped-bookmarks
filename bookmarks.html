@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
   <title>Bookmarks</title>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -115,7 +116,8 @@
         zoom: 13
       });
 
-      addBookmarks();
+      showCurrentLocation();
+      // addBookmarks();
 
       function addBookmarks() {
         infowindow = new google.maps.InfoWindow();
@@ -127,24 +129,24 @@
       }
 
       function searchPlace(placeName) {
-          var request = {
-            location: center,
-            radius: '10000',
-            keyword: placeName
-          };
+        var request = {
+          location: center,
+          radius: '10000',
+          keyword: placeName
+        };
 
-          service.nearbySearch(request, function(results, status) {
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
-              createMarker(results[0]);
-              completedPlaces++;
-              console.log(placeName + ": " + status + " ("+completedPlaces+"/"+bookmarks.length+")");
-            } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
-              console.log("retrying: " + placeName);
-              setTimeout(function() { searchPlace(placeName); }, Math.random() * 10000);
-            } else {
-              console.log(status);
-            }
-          });
+        service.nearbySearch(request, function(results, status) {
+          if (status == google.maps.places.PlacesServiceStatus.OK) {
+            createMarker(results[0]);
+            completedPlaces++;
+            console.log(placeName + ": " + status + " ("+completedPlaces+"/"+bookmarks.length+")");
+          } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+            console.log("retrying: " + placeName);
+            setTimeout(function() { searchPlace(placeName); }, Math.random() * 10000);
+          } else {
+            console.log(status);
+          }
+        });
       }
 
       function createMarker(place) {
@@ -158,6 +160,29 @@
           infowindow.setContent(place.name);
           infowindow.open(map, this);
         });
+      }
+
+      function showCurrentLocation() {
+        if (navigator.geolocation) {
+          var myloc = new google.maps.Marker({
+            clickable: false,
+            icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+                                              new google.maps.Size(22,22),
+                                              new google.maps.Point(0,18),
+                                              new google.maps.Point(11,11)),
+            shadow: null,
+            zIndex: 999,
+            map: map
+          });
+
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            console.log('here');
+            var me = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+            myloc.setPosition(me);
+          }, function(error) {
+              console.log(error);
+          });
+        }
       }
     }
 
