@@ -40,7 +40,8 @@
 
   <script>
     var bookmarks = [
-      "Taci's Beyti"
+      "Dominique Ansel Bakery"
+    , "Taci's Beyti"
     , "Saigon shack"
     , "Dorado"
     , "Triple shot world atlas"
@@ -55,7 +56,6 @@
     , "Sidewalk"
     , "Ardesia"
     , "Stillwater"
-    , "caravan of dreams"
     , "Buzkadi"
     , "Mono + mono"
     , "lula's sweet apothecary"
@@ -74,7 +74,6 @@
     , "ivy bakery and lounge"
     , "red moon"
     , "market at 6th and 2nd"
-    , "Cakeshop"
     , "sorella"
     , "lucien"
     , "schiller's"
@@ -94,7 +93,6 @@
     , "Organic Avenue"
     , "Prima"
     , "Mary o's"
-    , "Puck fair"
     , "Local 138"
     , "The Jane Hotel"
     , "Elsa"
@@ -121,7 +119,6 @@
     , "Klimat"
     , "Nomad"
     , "Sigmund's"
-    , "Euzkadi"
     , "Five points"
     , "Gramercy park bar"
     , "olde good things"
@@ -131,6 +128,36 @@
     , "ink48 hotel"
     , "la quinta"
     , "hotel metro"
+    , "156 2nd st"
+    , "anyway cafe"
+    , "the malt house"
+    , "w.d. 50"
+    , "yunnan kitchen"
+    , "preserve 24"
+    , "macondo"
+    , "prima"
+    , "dorian gray"
+    , "affaire"
+    , "cafeteria"
+    , "eileen's special cheesecake"
+    , "supper restaurant"
+    , "anthropology archive film"
+    , "Ichabod's"
+    , "westville east"
+    , "casimir"
+    , "stillwater"
+    , "gonzalez y gonzalez"
+    , "the smile"
+    , "Le philosophe"
+    , "butter lane"
+    , "the good fork"
+    , "Monteleone's"
+    , "Bergdorf Goodman"
+    , "Rocco's Pastry Shop"
+    , "Espresso Cafe"
+    , "Park bar"
+    , "The headless horseman"
+    , "Pierre Loti Wine Bar"
     ];
 
     var map;
@@ -209,7 +236,6 @@
           });
 
           navigator.geolocation.getCurrentPosition(function(pos) {
-            console.log('here');
             var me = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
             myloc.setPosition(me);
           }, function(error) {
