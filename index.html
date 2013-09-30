@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bookmarks</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map-canvas, #map_canvas {
+      height: 100%;
+    }
+
+    #legend {
+      background: white;
+      padding: 10px;
+    }
+
+    #legend span {
+      vertical-align: 90%;
+    }
+
+    @media print {
+      html, body {
+        height: auto;
+      }
+
+      #map-canvas, #map_canvas {
+        height: 650px;
+      }
+    }
+
+    #panel {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      margin-left: -180px;
+      z-index: 5;
+      background-color: #fff;
+      padding: 5px;
+      border: 1px solid #999;
+    }
+  </style>
+</head>
+<body>
+  <div id="map-canvas"></div>
+  <div id="legend"></div>
+
+  <script src="./jquery-2.0.3.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+  <script>
+    var Category = {
+      RESTAURANT : 0
+    , BAR : 1
+    , DESSERT : 2
+    , MISC: 3
+    , STORE: 4
+    };
+
+    var categoryColors = ['red', 'blue', 'green', 'purple', 'orange']
+
+    var bookmarks = [
+      ["Dominique Ansel Bakery", Category.DESSERT]
+    , ["Taci's Beyti", Category.RESTAURANT]
+    , ["Saigon shack", Category.RESTAURANT]
+    , ["Dorado", Category.RESTAURANT]
+    , ["Triple shot world atlas", Category.RESTAURANT]
+    , ["Gyu-kaku", Category.RESTAURANT]
+    , ["Ippudo NY", Category.RESTAURANT]
+    , ["Jack bistro", Category.RESTAURANT]
+    , ["Threeofcup", Category.RESTAURANT]
+    , ["Milon Bangladesh restaurant", Category.RESTAURANT]
+    , ["Ferrara bakery", Category.DESSERT]
+    , ["mug lounge", Category.BAR]
+    , ["Coal yard", Category.BAR]
+    , ["Sidewalk", Category.RESTAURANT]
+    , ["Ardesia", Category.BAR]
+    , ["lula's sweet apothecary", Category.DESSERT]
+    , ["L'arte del gelato", Category.DESSERT]
+    , ["sullivan street bakery", Category.DESSERT]
+    , ["fat witch bakery", Category.DESSERT]
+    , ["mancora", Category.RESTAURANT]
+    , ["Houston hall", Category.BAR]
+    , ["Clarke's standard", Category.RESTAURANT]
+    , ["forty carrots", Category.DESSERT]
+    , ["popbar", Category.DESSERT]
+    , ["dessert club", Category.DESSERT]
+    , ["cafe edison", Category.RESTAURANT]
+    , ["ivy bakery and lounge", Category.DESSERT]
+    , ["red moon", Category.RESTAURANT]
+    , ["market at 6th and 2nd", Category.RESTAURANT]
+    , ["sorella", Category.RESTAURANT]
+    , ["lucien", Category.RESTAURANT]
+    , ["schiller's", Category.RESTAURANT]
+    , ["stanton social", Category.RESTAURANT]
+    , ["Le gigot", Category.RESTAURANT]
+    , ["Vagabond cafe", Category.RESTAURANT]
+    , ["Peasant", Category.RESTAURANT]
+    , ["Keybar", Category.BAR]
+    , ["Bleecker st bar", Category.BAR]
+    , ["Gmt tavern", Category.BAR]
+    , ["Angelica kitchen", Category.RESTAURANT]
+    , ["The smith", Category.RESTAURANT]
+    , ["Xi'an", Category.RESTAURANT]
+    , ["Natori", Category.RESTAURANT]
+    , ["Yakitori Taisho", Category.RESTAURANT]
+    , ["Prima", Category.RESTAURANT]
+    , ["Mary o's", Category.BAR]
+    , ["Local 138", Category.BAR]
+    , ["The Jane Hotel", Category.BAR]
+    , ["Elsa", Category.BAR]
+    , ["Sidebar", Category.BAR]
+    , ["Malbec", Category.BAR]
+    , ["Bomboloni", Category.DESSERT]
+    , ["Beagle", Category.BAR]
+    , ["Cafe pick me up", Category.DESSERT]
+    , ["One mile house", Category.RESTAURANT]
+    , ["The third man", Category.BAR]
+    , ["Quartino", Category.RESTAURANT]
+    , ["Madam geneva", Category.BAR]
+    , ["Jones eats", Category.RESTAURANT]
+    , ["Gemma", Category.RESTAURANT]
+    , ["Whiskey town", Category.BAR]
+    , ["Feast", Category.RESTAURANT]
+    , ["Bahr che", Category.RESTAURANT]
+    , ["Mighty Quinn's", Category.RESTAURANT]
+    , ["Local 92", Category.RESTAURANT]
+    , ["Muji", Category.STORE]
+    , ["Big bar", Category.BAR]
+    , ["Enoteca", Category.BAR]
+    , ["Klimat", Category.BAR]
+    , ["Nomad", Category.RESTAURANT]
+    , ["Sigmund's", Category.RESTAURANT]
+    , ["Five points", Category.RESTAURANT]
+    , ["Gramercy park bar", Category.BAR]
+    , ["olde good things", Category.MISC]
+    , ["hotel on rivington", Category.BAR]
+    , ["the park", Category.BAR]
+    , ["the met's rooftop garden", Category.BAR]
+    , ["ink48 hotel", Category.BAR]
+    , ["la quinta", Category.BAR]
+    , ["hotel metro", Category.BAR]
+    , ["anyway cafe", Category.RESTAURANT]
+    , ["the malt house", Category.BAR]
+    , ["w.d. 50", Category.RESTAURANT]
+    , ["yunnan kitchen", Category.RESTAURANT]
+    , ["preserve 24", Category.RESTAURANT]
+    , ["macondo", Category.RESTAURANT]
+    , ["prima", Category.RESTAURANT]
+    , ["dorian gray", Category.RESTAURANT]
+    , ["affaire", Category.BAR]
+    , ["cafeteria", Category.RESTAURANT]
+    , ["anthropology archive film", Category.MISC]
+    , ["Ichabod's", Category.RESTAURANT]
+    , ["westville", Category.RESTAURANT]
+    , ["gonzalez y gonzalez", Category.RESTAURANT]
+    , ["the smile", Category.RESTAURANT]
+    , ["Le philosophe", Category.RESTAURANT]
+    , ["the good fork", Category.RESTAURANT]
+    , ["Monteleone's", Category.DESSERT]
+    , ["Rocco's Pastry Shop", Category.DESSERT]
+    , ["Espresso Cafe", Category.DESSERT]
+    , ["Park bar", Category.BAR]
+    , ["The headless horseman", Category.BAR]
+    , ["Pierre Loti Wine Bar", Category.BAR]
+    , ["a casa fox", Category.RESTAURANT]
+    , ["hair of the dog", Category.BAR]
+    , ["todd's mill", Category.RESTAURANT]
+    , ["277 grand st", Category.RESTAURANT]
+    , ["oddfellows ice cream", Category.DESSERT]
+    , ["eight turn crepe", Category.DESSERT]
+    , ["Burke & Wills", Category.RESTAURANT]
+    , ["hill country chicken", Category.RESTAURANT]
+    , ["momofuku milk bar", Category.DESSERT]
+    , ["pie face bakery cafe", Category.DESSERT]
+    , ["cakelab", Category.DESSERT]
+    , ["four & twenty blackbirds", Category.DESSERT]
+    , ["the blue stove", Category.DESSERT]
+    , ["serendipity", Category.DESSERT]
+    , ["black hound new york", Category.DESSERT]
+    , ["d'aiuto baby watson cheesecake", Category.DESSERT]
+    , ["pie corps", Category.DESSERT]
+    , ["melt bakery", Category.DESSERT]
+    , ["pies-n-thighs", Category.RESTAURANT]
+    , ["two little red hens", Category.RESTAURANT]
+    , ["eileen's special cheesecake", Category.DESSERT]
+    , ["spot dessert bar", Category.DESSERT]
+    , ["pasticceria rocco", Category.DESSERT]
+    , ["rice to riches", Category.DESSERT]
+    , ["eleven madison park", Category.RESTAURANT]
+    , ["the cinnamon snail", Category.DESSERT]
+    ];
+
+    var map;
+    var service;
+    var infowindow;
+    var completedPlaces;
+
+    function initialize() {
+      completedPlaces = 0;
+
+      var center = new google.maps.LatLng(40.725161,-73.986958);
+
+      // map
+      map = new google.maps.Map(document.getElementById('map-canvas'), {
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: center,
+        zoom: 13
+      });
+
+      // legend
+      map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
+
+      setupLegend();
+      showCurrentLocation();
+      addBookmarks();
+
+      function setupLegend() {
+        var legend = document.getElementById('legend');
+        for (var categoryName in Category) {
+          var categoryIcon = getCategoryMarkerIcon(Category[categoryName]);
+
+          var div = document.createElement('div');
+          div.innerHTML = '<img src="' + categoryIcon + '"><span>' + categoryName + '</span>';
+          legend.appendChild(div);
+        }
+      }
+
+      function showCurrentLocation() {
+        if (navigator.geolocation) {
+          var myloc = new google.maps.Marker({
+            clickable: false,
+            icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+                                              new google.maps.Size(22,22),
+                                              new google.maps.Point(0,18),
+                                              new google.maps.Point(11,11)),
+            shadow: null,
+            zIndex: 999,
+            map: map
+          });
+
+          navigator.geolocation.getCurrentPosition(
+            function(pos) {  // success
+              var me = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+              myloc.setPosition(me);
+          }, function(error) {  // error
+              console.log(error);
+
+              // fall back to lookup via ip address
+              $.getJSON("http://smart-ip.net/geoip-json?callback=?", function(data) {
+                var me = new google.maps.LatLng(data.latitude, data.longitude);
+                myloc.setPosition(me);
+              });
+          });
+        } else {
+          console.log('Browser does not use html5 navigator geolocation.');
+        }
+      }
+
+      function addBookmarks() {
+        infowindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
+
+        for (var i = 0; i < bookmarks.length; i++) {
+          searchPlace(bookmarks[i]);
+        }
+      }
+
+      function searchPlace(place) {
+        var placeName = place[0];
+
+        var request = {
+          location: center,
+          radius: '10000',
+          keyword: placeName
+        };
+
+        service.nearbySearch(request, function(results, status) {
+          if (status == google.maps.places.PlacesServiceStatus.OK) {
+            createMarker(place, results[0]);
+            completedPlaces++;
+            // console.log(placeName + ": " + status + " ("+completedPlaces+"/"+bookmarks.length+")");
+          } else if (status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+            // console.log("retrying: " + placeName);
+            setTimeout(function() { searchPlace(place); }, Math.random() * 10000);
+          } else {
+            // console.log(status);
+          }
+        });
+      }
+
+      function createMarker(place, searchResult) {
+        var placeLoc = searchResult.geometry.location;
+
+        var marker = new google.maps.Marker({
+          map: map,
+          position: searchResult.geometry.location,
+          icon: getCategoryMarkerIcon(place[1])
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(searchResult.name);
+          infowindow.open(map, this);
+        });
+      }
+
+      function getCategoryMarkerIcon(category) {
+        var markerIconURL = 'https://maps.google.com/mapfiles/ms/icons/COLOR-dot.png';
+        markerIconURL = markerIconURL.replace(/COLOR/, categoryColors[category]);
+
+        return markerIconURL;
+      }
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+</body>
+</html>
